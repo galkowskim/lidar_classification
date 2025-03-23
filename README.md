@@ -31,6 +31,14 @@ uv tool run pre-commit install
 
 ```
 
+### Contributing:
+
+1. When adding new dependency:
+
+```bash
+uv add <package-name>
+```
+
 ----------------------
 
 ### Project structure
