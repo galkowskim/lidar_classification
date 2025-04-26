@@ -8,12 +8,51 @@ dependencies = [
     "contextily>=1.6.2",
     "geopandas>=1.0.1",
     "jupyter>=1.1.1",
+    "laspy>=2.5.4",
     "matplotlib>=3.10.1",
+    "scikit-learn>=1.6.1",
+    "tqdm>=4.67.1",
     "xyzservices>=2025.1.0",
 ]
+[project.optional-dependencies]
+cpu = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+]
+cu118 = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+]
 
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cpu" },
+    { extra = "cu118" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu118", extra = "cu118" },
+]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu118", extra = "cu118" },
+]
 
 [tool.ruff]
 line-length = 120
 
 target-version = "py312"
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu118"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true
