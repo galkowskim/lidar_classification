@@ -57,7 +57,7 @@ uv tool run pre-commit install
 3.Process data using `prepare_data.py` script. (**Check more details about script arguments within the script.**)
 
 ```bash
-uv run python -m src.prepare_data --plot_numbers ... --shapefile_path ... --folder_name ... --save_plots (flag, optional)
+uv run python -m src.data_preparation.prepare_data --plot_numbers ... --shapefile_path ... --folder_name ... --save_plots (flag, optional)
 ```
 
 Sample execution:
