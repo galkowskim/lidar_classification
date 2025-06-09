@@ -41,12 +41,12 @@ def main(
     config = load_config(config_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    path_to_save = ARTIFACTS_DIR / config["model_save_path"]
-    os.makedirs(path_to_save, exist_ok=True)
-
     model_config = config["model"]
     model_name = model_config["name"]
-    model_params = model_config.get("params", {})
+    model_params = model_config["params"][model_name]
+
+    path_to_save = ARTIFACTS_DIR / model_name / config["model_save_path"]
+    os.makedirs(path_to_save, exist_ok=True)
 
     if model_name in MODEL_REGISTRY:
         model_class = MODEL_REGISTRY[model_name]
@@ -79,19 +79,24 @@ def main(
             scheduler.step()
 
         logger.info(
-            f"Epoch {epoch + 1}/{config['num_epochs']} - Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f} - Train Accuracy: {train_metrics.get('accuracy', 0):.4f}, Val Accuracy: {val_metrics.get('accuracy', 0):.4f}"
+            f"Epoch {epoch + 1}/{config['num_epochs']} - Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f} - Train Accuracy: {train_metrics.get('balanced_accuracy', 0):.4f}, Val Accuracy: {val_metrics.get('balanced_accuracy', 0):.4f}"
         )
 
         history["epoch"].append(epoch + 1)
         history["train_loss"].append(train_loss)
-        history["train_accuracy"].append(train_metrics.get("accuracy", 0))
+        history["train_accuracy"].append(train_metrics.get("balanced_accuracy", 0))
         history["val_loss"].append(val_loss)
-        history["val_accuracy"].append(val_metrics.get("accuracy", 0))
+        history["val_accuracy"].append(val_metrics.get("balanced_accuracy", 0))
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             counter = 0
-            model_save_path = path_to_save / f"{model_name}_epoch_{epoch + 1}.pth"
+            model_save_path = (
+                path_to_save
+                / f"{model_name}_epoch_{epoch + 1}_val_acc_{int(val_metrics.get('balanced_accuracy', 0) * 100)}.pth"
+            )
+            for file in path_to_save.glob("*.pth"):
+                os.remove(file)
             torch.save(model.state_dict(), model_save_path)
             logger.info(f"Saved Best Model at {model_save_path}!")
         else:
@@ -99,6 +104,14 @@ def main(
             if counter >= patience:
                 logger.info("Early stopping triggered.")
                 break
+
+    # Load the last saved model checkpoint before final validation
+    if model_save_path:
+        model.load_state_dict(torch.load(model_save_path, map_location=device))
+        logger.info(f"Loaded model checkpoint from {model_save_path}")
+    else:
+        logger.warning("No model checkpoint found to load.")
+    validate_one_epoch(model, val_loader, criterion, device, save_dir=path_to_save)
 
     metrics_df = pd.DataFrame(history)
     metrics_save_path = path_to_save / "training_metrics.csv"

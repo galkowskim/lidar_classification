@@ -7,7 +7,7 @@ Authors:
 - Jakub Kubacki
 
 ----------------------
- 
+
 ### Project setup
 
 0. Install [uv](https://docs.astral.sh/uv/).
@@ -73,6 +73,11 @@ This script produces the following outputs:
 - `data/torch/<folder_name>` - torch dataset files
 - updates `data/processed/README.md` with the processed data information for future reference
 
+Once all regions are processed organize data using `organize_data.py` script.
+```bash
+uv run python -m src.data_preparation.organize_data
+```
+
 ## Training models
 
 1. Prepare config (`config` folder), model architecture (`src/training/models.py`) and everything else needed.
@@ -110,7 +115,7 @@ lidar-classification/
 │
 │── notebooks/              # Jupyter Notebooks for exploration
 │   └── 01_data_exploration.ipynb
-│   └── ... 
+│   └── ...
 │
 │── src/                    # Source code
 │   └── data_preparation
@@ -121,22 +126,22 @@ lidar-classification/
 │       └── train.py        # Main script for training
 │
 │── training_artifacts/     # Saved models, metrics, plots etc...
-│   └── ... 
+│   └── ...
 │
 │── results/                # Classification results & evaluation
-│   └── ... 
+│   └── ...
 │
 │── configs/                # Configuration files
-│   └── ... 
+│   └── ...
 │
 │── scripts/                # Utility scripts for automation
-│   └── ... 
+│   └── ...
 │
 │── tests/                  # Unit and integration tests
 │   └── ...
 │
 │── .pre-commit-config.yaml # Pre-commit hooks (e.g., Ruff, uv)
-│── pyproject.toml          # Python dependencies 
+│── pyproject.toml          # Python dependencies
 │── .gitignore              # Ignore unnecessary files
 └── README.md               # Project description
 ```

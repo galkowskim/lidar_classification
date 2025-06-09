@@ -1,13 +1,13 @@
 data_dir: "data/torch/joined"
 batch_size: 128
 img_size: [128, 128]
-learning_rate: 0.001
+learning_rate: 0.0001
 num_epochs: 100
 early_stopping_patience: 10
 model_save_path: "test"
 
 model:
-  name: pretrained_resnet
+  name: small_vit
   params:
     pretrained_resnet:
       num_classes: 8
@@ -16,11 +16,12 @@ model:
       num_classes: 8
     small_vit:
       num_classes: 8
+      dropout: 0.05
 
 optimizer:
   name: Adam
   params:
-    lr: 0.001
+    lr: 0.0001
     weight_decay: 0.001
 
 scheduler:
