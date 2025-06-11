@@ -135,7 +135,7 @@ def plot_metrics(history: dict, save_dir: Path) -> None:
 
     plt.subplot(1, 2, 1)
     plt.plot(epochs, history["train_loss"], label="Train Loss", color="blue")
-    plt.plot(epochs, history["val_loss"], label="Validation Loss", color="orange")
+    plt.plot(epochs, history["val_loss"], label="Test Loss", color="orange")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Loss over Epochs")
@@ -144,7 +144,7 @@ def plot_metrics(history: dict, save_dir: Path) -> None:
 
     plt.subplot(1, 2, 2)
     plt.plot(epochs, history["train_accuracy"], label="Train Accuracy", color="blue")
-    plt.plot(epochs, history["val_accuracy"], label="Validation Accuracy", color="orange")
+    plt.plot(epochs, history["val_accuracy"], label="Test Accuracy", color="orange")
     plt.xlabel("Epoch")
     plt.ylabel("Balanced accuracy")
     plt.title("Accuracy over Epochs")

@@ -111,7 +111,15 @@ def main(
         logger.info(f"Loaded model checkpoint from {model_save_path}")
     else:
         logger.warning("No model checkpoint found to load.")
-    validate_one_epoch(model, val_loader, criterion, device, save_dir=path_to_save)
+    loss, metrics = validate_one_epoch(model, val_loader, criterion, device, save_dir=path_to_save)
+    print(f"Final Test Loss: {loss:.4f} - Final Test Accuracy: {metrics.get('balanced_accuracy', 0):.4f}")
+    print("Final Test Metrics:")
+    print(f"Accuracy: {metrics.get('accuracy', 0):.4f}")
+    print(f"Balanced Accuracy: {metrics.get('balanced_accuracy', 0):.4f}")
+    print(f"Classification Report: {metrics.get('classification_report', 'No classification report available.')}")
+    print(f"Precision: {metrics.get('precision', 0):.4f}")
+    print(f"Recall: {metrics.get('recall', 0):.4f}")
+    print(f"F1 Score: {metrics.get('f1_score', 0):.4f}")
 
     metrics_df = pd.DataFrame(history)
     metrics_save_path = path_to_save / "training_metrics.csv"
