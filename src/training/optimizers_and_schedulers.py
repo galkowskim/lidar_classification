@@ -1,5 +1,11 @@
 import torch.optim as optim
 
+SCHEDULERS = {
+    "StepLR": optim.lr_scheduler.StepLR,
+    "CosineAnnealingLR": optim.lr_scheduler.CosineAnnealingLR,
+    "OneCycleLR": optim.lr_scheduler.OneCycleLR,
+}
+
 
 def get_optimizer(model_parameters, config):
     optimizer_name = config["optimizer"]["name"]
@@ -9,9 +15,11 @@ def get_optimizer(model_parameters, config):
 
 
 def get_scheduler(optimizer, config):
-    if config["scheduler"] == "StepLR":
-        return optim.lr_scheduler.StepLR(optimizer, step_size=config["step_size"], gamma=config["gamma"])
-    elif config["scheduler"] == "CosineAnnealingLR":
-        return optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config["num_epochs"])
+    scheduler_name = config["scheduler"]["name"]
+    scheduler_params = config["scheduler"]["params"][scheduler_name]
+
+    if scheduler_name in SCHEDULERS:
+        scheduler_class = SCHEDULERS[scheduler_name]
+        return scheduler_class(optimizer, **scheduler_params)
     else:
-        return None
+        raise ValueError(f"Scheduler '{scheduler_name}' is not registered in SCHEDULERS.")

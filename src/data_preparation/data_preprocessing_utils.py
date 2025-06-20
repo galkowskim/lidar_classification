@@ -4,15 +4,17 @@ import os
 from collections import defaultdict
 
 import re
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from shapely.geometry import Point
 from tqdm import tqdm
 import laspy
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import box
-from src.data_preparation.constants import DATA_FOLDER
+from src.data_preparation.constants import DATA_FOLDER, LABEL_MAPPING
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -81,7 +83,6 @@ def check_las_files(plot_numbers: list[str]) -> dict:
     logger.info("Plot numbers: %s", plot_numbers)
 
     in_no = defaultdict(int)
-
     for prefix in plot_numbers:
         if any(file.startswith(prefix) and file.endswith(".las") for file in os.listdir(DATA_FOLDER / "las")):
             in_no["in"] += 1
@@ -236,10 +237,14 @@ def plot_lidar_by_coasttype(
     - figsize (tuple): Size of the figure in inches. Default is (12, 8).
     - dpi (int): Resolution of the saved figure in dots per inch. Default is 300.
     """
+
+    cmap = cm.get_cmap("tab10", len(LABEL_MAPPING))
+    coasttype_colors = {ct: cmap(i) for ct, i in LABEL_MAPPING.items()}
+
     plt.figure(figsize=figsize)
     for group in df["coasttype"].dropna().unique():
         data = df.loc[df["coasttype"] == group].sample(frac=sample_frac)
-        plt.scatter(data["x"], data["y"], s=1, label=group, alpha=0.6)
+        plt.scatter(data["x"], data["y"], s=1, label=group, alpha=0.9, color=coasttype_colors.get(group, "gray"))
 
     plt.xlabel("X (m)")
     plt.ylabel("Y (m)")
@@ -305,7 +310,7 @@ def plot_lidar_tiles(
     for img, (x0, x1, y0, y1) in tqdm(tiles_to_plot, desc="Plotting tiles"):
         ax.imshow(img, extent=(x0, x1, y0, y1), origin="lower", cmap="gray", alpha=tile_alpha)
 
-    gdf.plot(ax=ax, edgecolor="red", linewidth=1, facecolor="none", alpha=boundary_alpha)
+    gdf.plot(ax=ax, edgecolor="grey", linewidth=0.5, facecolor="none", alpha=boundary_alpha)
 
     ax.set_xlabel("Longitude (x)")
     ax.set_ylabel("Latitude (y)")
@@ -343,4 +348,5 @@ def save_aggregated_las_fragments_and_update_readme(
         readme_path.touch()
 
     with readme_path.open("a") as f:
-        f.write(f"{folder_name}: {plot_numbers}, {shapefile_path}\n")
+        plot_numbers_str = json.dumps(plot_numbers, ensure_ascii=False)
+        f.write(f"{folder_name}: {plot_numbers_str},\n{shapefile_path}\n")
