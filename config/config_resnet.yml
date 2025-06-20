@@ -1,0 +1,25 @@
+data_dir: "data/torch/zatoka_przy_polwyspie"
+batch_size: 32
+img_size: [128, 128]
+learning_rate: 0.001
+num_epochs: 30
+early_stopping_patience: 5
+model_save_path: "zatoka_przy_polwyspie" # this will be subdirectory of training_artifacts
+
+model:
+  name: pretrained_resnet
+  params:
+    num_classes: 5
+    pretrained: true
+
+optimizer:
+  name: Adam
+  params:
+    lr: 0.001
+    weight_decay: 0.0001
+
+scheduler:
+  name: StepLR
+  params:
+    step_size: 10
+    gamma: 0.1
