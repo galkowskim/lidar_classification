@@ -59,7 +59,7 @@ def main(
     optimizer = get_optimizer(model.parameters(), config)
     scheduler = get_scheduler(optimizer, config)
 
-    best_val_loss = float("inf")
+    best_val_loss = -float("inf")
     patience = config["early_stopping_patience"]
     counter = 0
 
@@ -88,8 +88,8 @@ def main(
         history["val_loss"].append(val_loss)
         history["val_accuracy"].append(val_metrics.get("balanced_accuracy", 0))
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        if val_metrics["balanced_accuracy"] > best_val_loss:
+            best_val_loss = val_metrics["balanced_accuracy"]
             counter = 0
             model_save_path = (
                 path_to_save
